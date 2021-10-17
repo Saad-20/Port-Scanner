@@ -1,6 +1,7 @@
 #!usr/bin/python3
 import pyfiglet
 import nmap
+import sys
 from colorama import Style
 
 #----------Colors----------#
@@ -21,9 +22,10 @@ def banner():
  print("{0}@Version: {1} 1.0\n{2}".format(colors.YELLOW,colors.CYAN,Style.RESET_ALL))
 banner()
 
-ip_Address = input("{0}Enter Ip address:{1} ".format(colors.RED,Style.RESET_ALL))
+try:
+ ip_Address = input("{0}Enter Ip address:{1} ".format(colors.RED,Style.RESET_ALL))
 
-selection = input("""{0}Select the type of scan:-
+ selection = input("""{0}Select the type of scan:-
 	   {1} 1)Regular Scan
 	    2)Comprehensive Scan
 	    3)SYN ACK Scan
@@ -32,22 +34,32 @@ selection = input("""{0}Select the type of scan:-
 	    6)OS Detection Scan
 	    7)Multiple IP\n{2}""".format(colors.RED,colors.YELLOW,Style.RESET_ALL))
 
-print("{0}you have selected: {1}{2}{3}".format(colors.BLUE,colors.YELLOW,selection,Style.RESET_ALL))
+ print("{0}you have selected: {1}{2}{3}".format(colors.BLUE,colors.YELLOW,selection,Style.RESET_ALL))
 
-if selection == '1':
- Scanner.scan(ip_Address)
- print("Ip Status: {0}".format(Scanner[ip_Address].state()))
- for host in Scanner.all_hosts():
-  for proto in Scanner[host].all_protocols():
-   lport = Scanner[host][proto].keys()
-   for port in sorted(lport):
-    print("port: {0}  state: {1}  service: {2}".format(port, Scanner[host][proto][port]['state'], Scanner[host][proto][port]['name']))
+ if selection == '1':
+  Scanner.scan(ip_Address, '1-1024', '-v -A -sV -sC -A -O')
+  print("Ip Status: {0}".format(Scanner[ip_Address].state()))
+  print(Scanner.all_hosts())
+  for host in Scanner.all_hosts():
+   for proto in Scanner[host].all_protocols():
+    lport = Scanner[host][proto].keys()
+    print(lport)
+    for port in sorted(lport):
+     print("port: {0}  state: {1}  service: {2}".format(port, Scanner[host][proto][port]['state'], Scanner[host][proto][port]['name']))
 
-elif selection == '2':
- Scanner.scan(ip_Address, '1-1024', '-v -sS -sV -sC -A -O')
- print("Ip Status: ", Scanner[ip_Address].state())
- print("Open Ports: ", Scanner[ip_Address]['tcp'].keys())
- print(Scanner[ip_Address].all_protocols())
+ elif selection == '2':
+  print(Scanner.scan(ip_Address, '1-1024', '-v -sS -sV -sC -A -O'))
+  print("Ip Status: ", Scanner[ip_Address].state())
+  print("Open Ports: ", Scanner[ip_Address]['tcp'].keys())
+  print(Scanner[ip_Address].all_protocols())
+  print(Scanner[ip_Address].hostname())
 
-else:
- print("Please enter a selection")
+ else:
+  print("Please enter a selection\n")
+
+except nmap.nmap.PortScannerError:
+ print("\n{0}Run sudo privileges to run this option{1}".format(colors.RED,Style.RESET_ALL))
+
+except KeyboardInterrupt:
+ print("\n{0}Ctrl + C Detected! {1}Exit system{2}".format(colors.RED,colors.YELLOW,Style.RESET_ALL))
+ sys.exit(0)
