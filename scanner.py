@@ -37,9 +37,8 @@ try:
  print("{0}you have selected: {1}{2}{3}".format(colors.BLUE,colors.YELLOW,selection,Style.RESET_ALL))
 
  if selection == '1':
-  Scanner.scan(ip_Address, '1-1024', '-v -A -sV -sC -A -O')
+  Scanner.scan(ip_Address)
   print("Ip Status: {0}".format(Scanner[ip_Address].state()))
-  print(Scanner.all_hosts())
   for host in Scanner.all_hosts():
    for proto in Scanner[host].all_protocols():
     lport = Scanner[host][proto].keys()
@@ -48,12 +47,18 @@ try:
      print("port: {0}  state: {1}  service: {2}".format(port, Scanner[host][proto][port]['state'], Scanner[host][proto][port]['name']))
 
  elif selection == '2':
-  print(Scanner.scan(ip_Address, '1-1024', '-v -sS -sV -sC -A -O'))
-  print("Ip Status: ", Scanner[ip_Address].state())
-  print("Open Ports: ", Scanner[ip_Address]['tcp'].keys())
-  print(Scanner[ip_Address].all_protocols())
-  print(Scanner[ip_Address].hostname())
-
+  Scanner.scan(ip_Address, '1-1024', '-v -sS -sV -sC -A -O')
+  print("IP Status: {0}".format(Scanner[ip_Address].state()))
+  print(Scanner.all_hosts())
+  print("-"*20)
+  for host in Scanner.all_hosts():
+   for proto in Scanner[host].all_protocols():
+    lport = Scanner[host][proto].keys()
+    print(lport)
+    for port in sorted(lport):
+     print("port: {0} | state: {1} | service: {2} | Version: {3} |".format(port, Scanner[host][proto][port]['state'], Scanner[host][proto][port]['name'], Scanner[host][proto][port]['product']))
+   print("{0}OS:{1} {2}{3}".format(colors.YELLOW,colors.RED,Scanner[host]['osmatch'][1]['name'],Style.RESET_ALL))
+  
  else:
   print("Please enter a selection\n")
 
